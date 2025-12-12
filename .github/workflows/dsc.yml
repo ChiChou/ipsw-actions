@@ -1,0 +1,39 @@
+name: Get Dyld Shared Cache
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  OS: iOS
+  DEVICE: iPhone9,3
+  VERSION: 15.8.5
+  BUILD: 19H394
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: install ipsw
+        env:
+          IPSW_VERSION: "3.1.643"
+        run: |
+          curl -L "https://github.com/blacktop/ipsw/releases/download/v${{ env.IPSW_VERSION }}/ipsw_${{ env.IPSW_VERSION }}_macOS_universal.tar.gz" -o ipsw.tgz
+          tar -xzf ipsw.tgz -C /tmp
+
+      - name: get firmware
+        run: /tmp/ipsw download appledb --os "${{ env.OS }}" --version "${{ env.VERSION }}" --device "${{ env.DEVICE }}" --build "${{ env.BUILD }}"
+
+      - name: extract
+        run: /tmp/ipsw extract -d *.ipsw
+
+      - name: debug
+        run: ls "${{ env.BUILD }}__${{ env.DEVICE }}"
