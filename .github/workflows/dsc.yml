@@ -10,10 +10,11 @@ permissions:
   contents: read
 
 env:
-  OS: iOS
-  DEVICE: iPhone9,3
-  VERSION: 15.8.5
-  BUILD: 19H394
+  # OS: iOS
+  # DEVICE: iPhone14,5
+  # VERSION: 15.6
+  # BUILD: 19G71
+  URL: https://updates.cdn-apple.com/2022SummerFCS/fullrestores/012-41728/C0769E31-5F11-4F6F-AF48-58175F955F51/iPhone14,5_15.6_19G71_Restore.ipsw
   OUTPUT: dsc
 
 jobs:
@@ -31,13 +32,14 @@ jobs:
           tar -xzf ipsw.tgz -C /tmp
 
       - name: get firmware
-        run: /tmp/ipsw download appledb --os "${{ env.OS }}" --version "${{ env.VERSION }}" --device "${{ env.DEVICE }}" --build "${{ env.BUILD }}"
+        # run: /tmp/ipsw download appledb --os "${{ env.OS }}" --version "${{ env.VERSION }}" --device "${{ env.DEVICE }}" --build "${{ env.BUILD }}"
+        run: curl -L ${{env.URL}} -o firmware.ipsw
 
       - name: extract
-        run: /tmp/ipsw extract -d *.ipsw --output ${{ env.OUTPUT }}
+        run: /tmp/ipsw extract -d firmware.ipsw --output ${{ env.OUTPUT }}
 
-      - name: debug
-        run: ls ${{ env.OUTPUT }}
+      # - name: debug
+      #   run: ls ${{ env.OUTPUT }}
 
       - uses: actions/upload-artifact@v4
         with:
